@@ -7,6 +7,6 @@ $(document).ready(function() {
   $('#issueForm').submit(function(event){
     event.preventDefault();
     var medicalIssue = $("#issue").val();
-    getDoctors(medicalIssue);
+    exports.getDoctors(medicalIssue);
   });
 });
