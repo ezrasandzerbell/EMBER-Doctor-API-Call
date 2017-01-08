@@ -2,24 +2,34 @@
 exports.apiKey = "c2d7269116a1f356e5f16b448c219c73";
 
 },{}],2:[function(require,module,exports){
-// var apiKey = require('./../.env').apiKey;
-
-// constructor to store doctors names in an array
-function Doctor(list) {
-  // this.list = [];
-}
-
-// create method to reassign this.list array to feature names of the doctors
-// Doctor.prototype.names = function(apiResults) {
-//   this.list = apiResults;
-// };
-
-exports.doctorModule = Doctor;
-
-},{}],3:[function(require,module,exports){
-var Doctor = require('./../js/doctor.js').doctorModule;
 var apiKey = require('./../.env').apiKey;
 
+function Doctor(list) {
+  this.list = [];
+}
+
+Doctor.prototype.locateDoctors = function(medicalIssue){
+
+  $.get('https://api.betterdoctor.com/2016-03-01/doctors?query='+ medicalIssue+'&location=45.5231%2C-122.6765%2C%205&user_location=45.5231%2C-122.6765&skip=0&limit=20&user_key=' + apiKey)
+    .then(function(result) {
+      console.log(result);
+      var doctors = result.data;
+
+      doctors.forEach(function(doctor){
+        var first_name = doctor.profile.first_name;
+        var last_name = doctor.profile.last_name;
+        $('#doctorList').append("<li>" + first_name + " " + last_name + "</li>");
+      });
+
+    })
+    .fail(function(error){
+      console.log("fail");
+  });
+};
+exports.doctorModule = Doctor;
+
+},{"./../.env":1}],3:[function(require,module,exports){
+var Doctor = require('./../js/doctor.js').doctorModule;
 
 $(document).ready(function() {
 
@@ -27,23 +37,9 @@ $(document).ready(function() {
     event.preventDefault();
     var medicalIssue = $("#issue").val();
 
-    $.get('https://api.betterdoctor.com/2016-03-01/doctors?query='+ medicalIssue+'&location=45.5231%2C-122.6765%2C%205&user_location=45.5231%2C-122.6765&skip=0&limit=20&user_key=' + apiKey)
-     .then(function(result) {
-
-        var doctors = result.data;
-        console.log(doctors);
-        doctors.forEach(function(resultArray){
-          var first_name = resultArray.profile.first_name;
-          var last_name = resultArray.profile.last_name;
-          console.log(first_name);
-          $('#doctorList').append("<li>" + first_name + " " + last_name + "</li>");
-        });
-
-      })
-     .fail(function(error){
-        console.log("fail");
-      });
+    var doctors = new Doctor();
+    doctors.locateDoctors(medicalIssue);
   });
 });
 
-},{"./../.env":1,"./../js/doctor.js":2}]},{},[3]);
+},{"./../js/doctor.js":2}]},{},[3]);
